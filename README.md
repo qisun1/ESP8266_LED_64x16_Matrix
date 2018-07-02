@@ -4,16 +4,16 @@ This library provides an ESP8266 driver to run LED matrix, supporting ASCII enco
 
 ## Examples
 
-In examples directory. I am adding more display modes.
+In examples directory.
 
 ## Limitations
-The current code does not work with green color, and 64x32 matrix yet. Slight modification is needed. 
+The current code does not yet implement pins for green color as well as data_r2 pin used for 64x32 matrix. Slight modification is needed. I am probably not going to do that as I only have red color matrix. After this project, I am going to switch RGB LED matrix.
 
 
 
 ## Compatible Hardware
 
-The library works with ESP8266 based board:
+The library works with ESP8266 based board, and one or multiple 64x16 LED matrix.
 
 
 ## License
