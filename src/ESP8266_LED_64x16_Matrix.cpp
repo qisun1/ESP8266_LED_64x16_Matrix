@@ -13,22 +13,24 @@ ESP8266_LED_64x16_Matrix::ESP8266_LED_64x16_Matrix()
 }
 
 //screen mode is an integer code: 0:64x16 1:128x16;
-void ESP8266_LED_64x16_Matrix::setDisplay(uint8_t displayMode)
+void ESP8266_LED_64x16_Matrix::setDisplay(uint8_t matrixType, uint8_t panels)
 {
 	ESP8266_LED_64x16_Matrix::isrInstance = this;
-	switch (displayMode)
+	switch (matrixType)
 	{
-	case 0:
-		used_buffer_size = 144;
-		columnNumber = 8;
-		rowCount = 16;
+		case 0:
+			columnNumber = 8 * panels;
+			rowCount = 16;
+			bufferSize = (columnNumber+1)*rowCount;
 		break;
-	case 1:
-		used_buffer_size = 272;
-		columnNumber = 16;
-		rowCount = 16;
-		break;
+		default:
+			columnNumber = 8 * panels;
+			rowCount = 16;
+			bufferSize = (columnNumber + 1)*rowCount;
+			break;
 	}
+
+	buffer = new uint8_t[bufferSize];
 
 	scrollPointer = 0;
 	scanRow = 0;
@@ -91,41 +93,25 @@ void ESP8266_LED_64x16_Matrix::turnOff()
 
 void ESP8266_LED_64x16_Matrix::clear_buffer()
 {
-	for (int i = 0; i <used_buffer_size; i++)
+	for (uint16_t i = 0; i <bufferSize; i++)
 	{
 		buffer[i] = 0x00;
 	}
 }
 
-void ESP8266_LED_64x16_Matrix::clear_buffer2()
-{
-	for (int i = 0; i <used_buffer_size; i++)
-	{
-		buffer2[i] = 0x00;
-	}
-}
 
-void ESP8266_LED_64x16_Matrix::drawChar(uint16_t xcol, uint16_t ycol, uint8_t n, uint8_t whichBuffer) {
+void ESP8266_LED_64x16_Matrix::drawChar(uint16_t xcol, uint16_t ycol, uint8_t n) {
 	uint8_t charbytes[rowCount], fontrows;
 	int index;
 	fontrows = 16;
 	index = (n-32)*fontrows; // go to the right code for this character																						 // addressing start at buffer and add y (rows) * (WIDTH is 64 so WIDTH/8) is 8 plus (x / 8) is 0 to 7
 	for (byte i = 0; i<fontrows; i++) {  // fill up the charbytes array with the right bits
 		charbytes[i] = font8x16_basic[index + i];
-		 //charbytes[i] = 'A';
 	};
 																				 // addressing start at buffer and add y (rows) * (WIDTH is 64 so WIDTH/8) is 8 plus (x / 8) is 0 to 7
 	byte *pDst = buffer + (ycol * (columnNumber + 1)) + xcol;
 
-	//byte *pDst;
-	//if (whichBuffer == 2)
-	//{
-	//	pDst = buffer2 + (ycol * (columnNumber + 1)) + xcol;
-	//}
-	//else
-	//{
-	//	pDst = buffer + (ycol * (columnNumber + 1)) + xcol;
-	//}
+
 	byte *pSrc = charbytes; // point at the first set of 8 pixels    
 	for (byte i = 0; i<fontrows; i++) {
 		*pDst = *pSrc;     // populate the destination byte
@@ -158,7 +144,7 @@ void ESP8266_LED_64x16_Matrix::moveLeft(uint8_t pixels, uint8_t rowstart, uint8_
 void ESP8266_LED_64x16_Matrix::scrollTextHorizontal(uint16_t delaytime)
 {
 	// display next character of message
-	drawChar(columnNumber, 0, message[scrollPointer % (message.length())], 1);
+	drawChar(columnNumber, 0, message[scrollPointer % (message.length())]);
 	scrollPointer++;
 	if (scrollPointer >= message.length())
 	{
@@ -178,7 +164,7 @@ void ESP8266_LED_64x16_Matrix::BreakTextInFrames(uint16_t delaytime)
 	clear_buffer();
 	for (uint8_t i = 0; i < columnNumber; i++)
 	{
-		drawChar(i, 0, message[scrollPointer], 1);
+		drawChar(i, 0, message[scrollPointer]);
 		scrollPointer++;
 		if (scrollPointer >= message.length())
 		{
@@ -189,12 +175,17 @@ void ESP8266_LED_64x16_Matrix::BreakTextInFrames(uint16_t delaytime)
 	delay(delaytime);
 }
 
+
+//not tested , need to double the buffer size in the setScreen
 void ESP8266_LED_64x16_Matrix::scrollTextVertical(uint16_t delaytime)
 {
-	clear_buffer2();
+	for (uint16_t i = bufferSize; i <(2* bufferSize); i++)
+	{
+		buffer[i] = 0x00;
+	}
 	for (uint8_t i = 0; i < columnNumber; i++)
 	{
-		drawChar(i, 0, message[scrollPointer], 2);
+		drawChar(i, rowCount, message[scrollPointer]);
 		scrollPointer++;
 		if (scrollPointer >= message.length())
 		{
@@ -205,21 +196,14 @@ void ESP8266_LED_64x16_Matrix::scrollTextVertical(uint16_t delaytime)
 
 	for (uint8_t t = 0; t < rowCount; t++)
 	{
-		for (uint8_t i = 0; i < rowCount - 1; i++)
+		for (uint8_t i = 0; i< (rowCount * 2 - 1); i++)
 		{
-			for (uint8_t j = 0; j < columnNumber; j++)
-			{
-				buffer[i*(columnNumber + 1) + j] = buffer[(i + 1)*(columnNumber + 1) + j];
-			}
-		}
-
-		for (uint8_t j = 0; j < columnNumber; j++)
-		{
-			buffer[(rowCount - 1)*(columnNumber + 1) + j] = buffer2[t*(columnNumber + 1) + j];
+			memcpy(buffer + i * (columnNumber + 1), buffer + (i + 1)*(columnNumber + 1), columnNumber + 1);
 		}
 		delay(50);
 	}
 	delay(delaytime);
+
 }
 
 void  ESP8266_LED_64x16_Matrix::ISR_TIMER_SCAN()

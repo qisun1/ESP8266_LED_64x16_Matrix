@@ -11,10 +11,7 @@ https://github.com
 #include <Arduino.h>
 #include <FS.h>   // Include the SPIFFS library
 
-#define nextT 10000
-#define maximum_buffer_size 272
-
-
+#define nextT 1000
 
 static const uint8_t font8x16_basic[] = {
 	/*   (32) */ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -120,13 +117,9 @@ class ESP8266_LED_64x16_Matrix {
 private:
 	static ESP8266_LED_64x16_Matrix * isrInstance;
 	static void interruptHandler();
-
-	uint8_t buffer[maximum_buffer_size];
-
-	static uint8_t buffer2[maximum_buffer_size]; // this is for vertical scroll, two buffers needed
+	uint8_t *buffer;
 
 	void clear_buffer();
-	void clear_buffer2();
 	void ISR_TIMER_SCAN();
 	void moveLeft(byte pixels, byte rowstart, byte rowstop);
 
@@ -134,7 +127,7 @@ private:
 	uint8_t scrollPointer;
 	
 	uint32_t rowPin;
-	uint16_t used_buffer_size;
+	uint16_t bufferSize;
 	uint8_t columnNumber;
 	uint8_t rowCount;
 
@@ -157,11 +150,11 @@ public:
 
    ESP8266_LED_64x16_Matrix();
    
-   void setDisplay(uint8_t displayMode); //display mode is an integer code: 0:64x16 1:128x16;
+   void setDisplay(uint8_t matrixType, uint8_t panels); //matrixType mode is an integer code: 0:64x16, single red only; other types not implemented 
    void setPins(uint8_t pins[8]);
    void turnOn();
    void turnOff();
-   void drawChar(uint16_t xcol, uint16_t ycol, uint8_t n, uint8_t whichBuffer); //1 for buffer1; 2 for buffer 2
+   void drawChar(uint16_t xcol, uint16_t ycol, uint8_t n); 
    void scrollTextHorizontal(uint16_t delaytime); // delay time is the time between 1/8 character, in miliseconds
    void scrollTextVertical(uint16_t delaytime);
    void BreakTextInFrames(uint16_t delaytime); // delay time is the time between frames, in miliseconds
