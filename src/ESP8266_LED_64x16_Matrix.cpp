@@ -38,13 +38,12 @@ void ESP8266_LED_64x16_Matrix::setDisplay(uint8_t matrixType, uint8_t panels)
 
 	timer1_attachInterrupt(interruptHandler);
 
-	
+
 	timer1_write(nextT);
 	timer1_disable();
-	delay(100);
-	//timer1_enable(TIM_DIV16, TIM_EDGE, TIM_SINGLE);
 
-	//delay(100);
+
+	delay(100);
 }
 
 void ESP8266_LED_64x16_Matrix::setPins(uint8_t pins[8])
@@ -54,10 +53,10 @@ void ESP8266_LED_64x16_Matrix::setPins(uint8_t pins[8])
 	data_R1 = pins[2];
 	//data_R2 = ;
 	en_74138 = pins[3];
-	uint8_t la_74138 = pins[4];
-	uint8_t lb_74138 = pins[5];
-	uint8_t lc_74138 = pins[6];
-	uint8_t ld_74138 = pins[7];
+	la_74138 = pins[4];
+	lb_74138 = pins[5];
+	lc_74138 = pins[6];
+	ld_74138 = pins[7];
 
 	rowPin = (1 << la_74138) | (1 << lb_74138) | (1 << lc_74138) | (1 << ld_74138);
 
@@ -74,9 +73,6 @@ void ESP8266_LED_64x16_Matrix::turnOn()
 {
 	//timer1_isr_init();
 	timer1_enable(TIM_DIV16, TIM_EDGE, TIM_SINGLE);
-	//Set up ESP watchdog
-	//ESP.wdtDisable();
-	//ESP.wdtEnable(WDTO_8S);
 }
 
 void ESP8266_LED_64x16_Matrix::turnOff()
@@ -100,16 +96,16 @@ void ESP8266_LED_64x16_Matrix::clear_buffer()
 }
 
 
-void ESP8266_LED_64x16_Matrix::drawChar(uint16_t xcol, uint16_t ycol, uint8_t n) {
-	uint8_t charbytes[rowCount], fontrows;
-	int index;
-	fontrows = 16;
+void ESP8266_LED_64x16_Matrix::drawChar(uint16_t pixel_x, uint16_t pixel_y, uint8_t n) {
+	uint8_t fontrows= 16;
+	uint16_t index;
+	uint8_t charbytes[fontrows];
 	index = (n-32)*fontrows; // go to the right code for this character																						 // addressing start at buffer and add y (rows) * (WIDTH is 64 so WIDTH/8) is 8 plus (x / 8) is 0 to 7
 	for (byte i = 0; i<fontrows; i++) {  // fill up the charbytes array with the right bits
 		charbytes[i] = font8x16_basic[index + i];
 	};
 																				 // addressing start at buffer and add y (rows) * (WIDTH is 64 so WIDTH/8) is 8 plus (x / 8) is 0 to 7
-	byte *pDst = buffer + (ycol * (columnNumber + 1)) + xcol;
+	byte *pDst = buffer + (pixel_y * (columnNumber + 1)) + pixel_x;
 
 
 	byte *pSrc = charbytes; // point at the first set of 8 pixels    
@@ -226,11 +222,12 @@ void  ESP8266_LED_64x16_Matrix::ISR_TIMER_SCAN()
 	rowPinSet = rowPinSet | ((scanRow & 0x01) << la_74138);
 	WRITE_PERI_REG(PERIPHS_GPIO_BASEADDR + 4, rowPinSet);
 	digitalWrite(en_74138, LOW);     // Turn on display
-	scanRow++;                       // Do the next pair of rows next time this routine is called
+	scanRow++; 
+	// Do the next pair of rows next time this routine is called
 	if (scanRow == rowCount)
 	{
 		scanRow = 0;
-		//Serial.print(buffer[27]);
+		
 	}
 	timer1_write(nextT);
 	//interrupts();

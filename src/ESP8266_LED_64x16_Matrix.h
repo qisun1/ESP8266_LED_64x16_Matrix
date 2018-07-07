@@ -154,7 +154,7 @@ public:
    void setPins(uint8_t pins[8]);
    void turnOn();
    void turnOff();
-   void drawChar(uint16_t xcol, uint16_t ycol, uint8_t n); 
+   void drawChar(uint16_t pixel_x, uint16_t pixel_y, uint8_t n); 
    void scrollTextHorizontal(uint16_t delaytime); // delay time is the time between 1/8 character, in miliseconds
    void scrollTextVertical(uint16_t delaytime);
    void BreakTextInFrames(uint16_t delaytime); // delay time is the time between frames, in miliseconds
