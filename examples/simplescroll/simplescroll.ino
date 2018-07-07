@@ -15,6 +15,9 @@ ESP8266_LED_64x16_Matrix LEDMATRIX;
 
 void setup()
 {
+	//for some reason, my board requires 4 seconds delay when starting. otherwise there is a reset after 4 seconds. I do not know why
+	delay(4000);
+
 	Serial.begin(115200);
 
 	//start the display for a mode
@@ -22,20 +25,27 @@ void setup()
 	uint8_t t[8] = { latchPin, clockPin, data_R1, en_74138, la_74138, lb_74138, lc_74138, ld_74138};
 	LEDMATRIX.setPins(t);
 	
-	LEDMATRIX.setDisplay(0);
+	LEDMATRIX.setDisplay(0, 1);
 
 
 	//LEDMATRIX.drawChar(0, 0, 'A', 1);
 
 	LEDMATRIX.turnOn();
 
-	LEDMATRIX.message = "ABCDEFGHIJKLMN ";
+	LEDMATRIX.message = "ABCDEFGHIJKLMN";
 	//LEDMATRIX.turnOn();
 }
 
 void loop()
 {
+	//horizontal scroll
 	LEDMATRIX.scrollTextHorizontal(100);
+
+	//vertical scroll
+	//LEDMATRIX.scrollTextVertical(100);
+
+	//static change screen
+	//LEDMATRIX.BreakTextInFrames(100);
 
 }
 
