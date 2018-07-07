@@ -101,15 +101,15 @@ void ESP8266_LED_64x16_Matrix::drawChar(uint16_t pixel_x, uint16_t pixel_y, uint
 	uint16_t index;
 	uint8_t charbytes[fontrows];
 	index = (n-32)*fontrows; // go to the right code for this character																						 // addressing start at buffer and add y (rows) * (WIDTH is 64 so WIDTH/8) is 8 plus (x / 8) is 0 to 7
-	for (byte i = 0; i<fontrows; i++) {  // fill up the charbytes array with the right bits
+	for (uint8_t i = 0; i<fontrows; i++) {  // fill up the charbytes array with the right bits
 		charbytes[i] = font8x16_basic[index + i];
 	};
 																				 // addressing start at buffer and add y (rows) * (WIDTH is 64 so WIDTH/8) is 8 plus (x / 8) is 0 to 7
-	byte *pDst = buffer + (pixel_y * (columnNumber + 1)) + pixel_x;
+	uint8_t *pDst = buffer + (pixel_y * (columnNumber + 1)) + pixel_x;
 
 
-	byte *pSrc = charbytes; // point at the first set of 8 pixels    
-	for (byte i = 0; i<fontrows; i++) {
+	uint8_t *pSrc = charbytes; // point at the first set of 8 pixels    
+	for (uint8_t i = 0; i<fontrows; i++) {
 		*pDst = *pSrc;     // populate the destination byte
 		pDst += columnNumber + 1;         // go to next row on buffer
 		pSrc++;            // go to next set of 8 pixels in character
@@ -131,7 +131,7 @@ void ESP8266_LED_64x16_Matrix::moveLeft(uint8_t pixels, uint8_t rowstart, uint8_
 			else {                // shuffle pixels left and add leftmost pixels from next column
 				uint8_t incomingchar = buffer[index + 1];
 				buffer[index] = buffer[index] << pixels;
-				for (byte x = 0; x<pixels; x++) { buffer[index] += ((incomingchar & (0x80 >> x)) >> (7 - x)) << (pixels - x - 1); };
+				for (uint8_t x = 0; x<pixels; x++) { buffer[index] += ((incomingchar & (0x80 >> x)) >> (7 - x)) << (pixels - x - 1); };
 			}
 		}
 	}
@@ -207,8 +207,8 @@ void  ESP8266_LED_64x16_Matrix::ISR_TIMER_SCAN()
 	//noInterrupts();
 	digitalWrite(en_74138, HIGH);     // Turn off display
 									  // Shift out 8 columns
-	for (byte column = 0; column<columnNumber; column++) {
-		byte index = column + (scanRow *(columnNumber+1));
+	for (uint8_t column = 0; column<columnNumber; column++) {
+		uint8_t index = column + (scanRow *(columnNumber+1));
 		shiftOut(data_R1, clockPin, MSBFIRST, buffer[index]);
 	};
 

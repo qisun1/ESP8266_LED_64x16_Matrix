@@ -120,7 +120,7 @@ private:
 
 	void clear_buffer();
 	void ISR_TIMER_SCAN();
-	void moveLeft(byte pixels, byte rowstart, byte rowstop);
+	void moveLeft(uint8_t pixels, uint8_t rowstart, uint8_t rowstop);
 
 	uint8_t scanRow;
 	uint8_t scrollPointer;
@@ -133,7 +133,7 @@ private:
 	// Connections to board
 	uint8_t latchPin;
 	uint8_t clockPin;
-	byte data_R1;
+	uint8_t data_R1;
 	//const byte data_R2 = 11;
 	uint8_t en_74138;
 	uint8_t la_74138;
