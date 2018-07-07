@@ -30,7 +30,7 @@ void ESP8266_LED_64x16_Matrix::setDisplay(uint8_t matrixType, uint8_t panels)
 			break;
 	}
 
-	buffer = new uint8_t[bufferSize];
+	buffer = new uint8_t[bufferSize*2];
 
 	scrollPointer = 0;
 	scanRow = 0;

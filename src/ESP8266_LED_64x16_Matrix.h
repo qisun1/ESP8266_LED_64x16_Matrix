@@ -1,7 +1,7 @@
 /*
-ESP8266_LED_64x16_Matrix.h - A 64x16 matrix driver for MQTT.
+ESP8266_LED_64x16_Matrix.h - A 64x16 matrix driver for ESP8266.
 Qi Sun
-https://github.com
+https://github.com/qisun1/ESP8266_LED_64x16_Matrix
 */
 
 #ifndef ESP8266_LED_64x16_Matrix_h
@@ -9,7 +9,6 @@ https://github.com
 
 
 #include <Arduino.h>
-#include <FS.h>   // Include the SPIFFS library
 
 #define nextT 1000
 
