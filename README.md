@@ -2,6 +2,8 @@
 
 This library provides an ESP8266 driver to run LED matrix, supporting ASCII encoding. I am still testing it. It should work with one or multiple 64x16 LED matrix (red). If you have red-green matrix, the code needs to be slightly modified if you plan to use the green color. My LED matrxi has following pins: enable, clock, latch, data_r1, data r2(for 64x32 matrix), data_g1, data_g2 (for green color), and 4 row pins labeled (a, b, c, d). 
 
+I directly connect pins of the nodemcu to the LED matrix. I do not use level shift between the board and the LED matrix. 
+
 ## Examples
 
 In examples directory.
