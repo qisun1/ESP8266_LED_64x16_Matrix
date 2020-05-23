@@ -222,10 +222,13 @@ void ESP8266_LED_64x16_Matrix::scrollTextVertical(uint16_t delaytime)
 void  ESP8266_LED_64x16_Matrix::ISR_TIMER_SCAN()
 {
 	//noInterrupts();
-	GPOS |= 1 << en_74138;
-	//digitalWrite(en_74138, HIGH);     // Turn off display
-									  // Shift out 8 columns
 
+	// Turn off display
+	//digitalWrite(en_74138, HIGH); 
+	GPOS |= 1 << en_74138;
+	
+									  
+	//set scan row
 	WRITE_PERI_REG(PERIPHS_GPIO_BASEADDR + 8, rowPin);
 	uint32_t rowPinSet = ((scanRow >> 3) & 0x01) << ld_74138;
 	rowPinSet = rowPinSet | (((scanRow >> 2) & 0x01) << lc_74138);
@@ -233,7 +236,7 @@ void  ESP8266_LED_64x16_Matrix::ISR_TIMER_SCAN()
 	rowPinSet = rowPinSet | ((scanRow & 0x01) << la_74138);
 	WRITE_PERI_REG(PERIPHS_GPIO_BASEADDR + 4, rowPinSet);
 
-
+	// Shift out 8 columns
 	for (uint8_t column = 0; column < columnNumber; column++) {
 		uint8_t index = column + (scanRow *(columnNumber + 1));
 		//shiftOut(data_R1, clockPin, MSBFIRST, buffer[index]);
@@ -245,16 +248,19 @@ void  ESP8266_LED_64x16_Matrix::ISR_TIMER_SCAN()
 	//digitalWrite(latchPin, HIGH);
 	GP16O |= 1;
 
-
-	GPOC |= 1 << en_74138;
-	//digitalWrite(en_74138, LOW);     // Turn on display
-	scanRow++; 
 	// Do the next pair of rows next time this routine is called
+	scanRow++;
 	if (scanRow == rowCount)
 	{
 		scanRow = 0;
-		
+
 	}
+
+	// Turn on display
+	//digitalWrite(en_74138, LOW);     
+	GPOC |= 1 << en_74138;
+	
+
 	timer1_write(nextT);
 	//interrupts();
 }
