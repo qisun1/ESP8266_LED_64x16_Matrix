@@ -114,6 +114,17 @@ static const uint8_t font8x16_basic[] = {
 class ESP8266_LED_64x16_Matrix {
 
 private:
+	// Connections to board
+	uint8_t latchPin;
+	uint8_t clockPin;
+	uint8_t data_R1;
+	uint8_t data_R2;
+	uint8_t en_74138;
+	uint8_t la_74138;
+	uint8_t lb_74138;
+	uint8_t lc_74138;
+	uint8_t ld_74138;
+
 	static ESP8266_LED_64x16_Matrix * isrInstance;
 	static void interruptHandler();
 	uint8_t *buffer;
@@ -121,6 +132,7 @@ private:
 	void clear_buffer();
 	void ISR_TIMER_SCAN();
 	void moveLeft(uint8_t pixels, uint8_t rowstart, uint8_t rowstop);
+	void shiftOutFast(byte);
 
 	uint8_t scanRow;
 	uint8_t scrollPointer;
@@ -130,16 +142,7 @@ private:
 	uint8_t columnNumber;
 	uint8_t rowCount;
 
-	// Connections to board
-	uint8_t latchPin;
-	uint8_t clockPin;
-	uint8_t data_R1;
-	//const byte data_R2 = 11;
-	uint8_t en_74138;
-	uint8_t la_74138;
-	uint8_t lb_74138;
-	uint8_t lc_74138;
-	uint8_t ld_74138;
+
 
 
 

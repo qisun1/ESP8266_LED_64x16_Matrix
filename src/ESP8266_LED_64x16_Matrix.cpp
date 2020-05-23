@@ -137,6 +137,21 @@ void ESP8266_LED_64x16_Matrix::moveLeft(uint8_t pixels, uint8_t rowstart, uint8_
 	}
 };
 
+void ESP8266_LED_64x16_Matrix::shiftOutFast(byte data)
+{
+	byte i = 8;
+	do {
+		GPIO_REG_WRITE(GPIO_OUT_W1TC_ADDRESS, 1 << clockPin);
+		if (data & 0x80)
+			GPIO_REG_WRITE(GPIO_OUT_W1TS_ADDRESS, 1 << data_R1);
+		else
+			GPIO_REG_WRITE(GPIO_OUT_W1TC_ADDRESS, 1 << data_R1);
+		GPIO_REG_WRITE(GPIO_OUT_W1TS_ADDRESS, 1 << clockPin);
+		data <<= 1;
+	} while (--i);
+	return;
+}
+
 void ESP8266_LED_64x16_Matrix::scrollTextHorizontal(uint16_t delaytime)
 {
 	// display next character of message
@@ -202,18 +217,14 @@ void ESP8266_LED_64x16_Matrix::scrollTextVertical(uint16_t delaytime)
 
 }
 
+
+
 void  ESP8266_LED_64x16_Matrix::ISR_TIMER_SCAN()
 {
 	//noInterrupts();
-	digitalWrite(en_74138, HIGH);     // Turn off display
+	GPOS |= 1 << en_74138;
+	//digitalWrite(en_74138, HIGH);     // Turn off display
 									  // Shift out 8 columns
-	for (uint8_t column = 0; column<columnNumber; column++) {
-		uint8_t index = column + (scanRow *(columnNumber+1));
-		shiftOut(data_R1, clockPin, MSBFIRST, buffer[index]);
-	};
-
-	digitalWrite(latchPin, LOW);
-	digitalWrite(latchPin, HIGH);
 
 	WRITE_PERI_REG(PERIPHS_GPIO_BASEADDR + 8, rowPin);
 	uint32_t rowPinSet = ((scanRow >> 3) & 0x01) << ld_74138;
@@ -221,7 +232,22 @@ void  ESP8266_LED_64x16_Matrix::ISR_TIMER_SCAN()
 	rowPinSet = rowPinSet | (((scanRow >> 1) & 0x01) << lb_74138);
 	rowPinSet = rowPinSet | ((scanRow & 0x01) << la_74138);
 	WRITE_PERI_REG(PERIPHS_GPIO_BASEADDR + 4, rowPinSet);
-	digitalWrite(en_74138, LOW);     // Turn on display
+
+
+	for (uint8_t column = 0; column < columnNumber; column++) {
+		uint8_t index = column + (scanRow *(columnNumber + 1));
+		//shiftOut(data_R1, clockPin, MSBFIRST, buffer[index]);
+		shiftOutFast(buffer[index]);
+	}
+
+	//digitalWrite(latchPin, LOW);
+	GP16O &= ~1;
+	//digitalWrite(latchPin, HIGH);
+	GP16O |= 1;
+
+
+	GPOC |= 1 << en_74138;
+	//digitalWrite(en_74138, LOW);     // Turn on display
 	scanRow++; 
 	// Do the next pair of rows next time this routine is called
 	if (scanRow == rowCount)

@@ -4,6 +4,8 @@ This library provides an ESP8266 driver to run 64x16  LED matrix (red). It  supp
 
 I directly connect data pins of the ESP8266 Mini D1 (3.3v) to the LED panel (5v).  
 
+Latch pin ("LAT") must be connected to D0 (GPIO 16). GPIO 16 register is different from other GPIO.
+
 ![Circuit](https://raw.githubusercontent.com/qisun1/ESP8266_LED_64x16_Matrix/master/pictures/circuit_led64x16.png)
 
 
