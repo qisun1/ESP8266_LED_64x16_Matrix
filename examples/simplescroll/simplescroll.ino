@@ -1,6 +1,10 @@
 #include <ESP8266_LED_64x16_Matrix.h>
 // Connections to board
+
+// latchPin must be D0
 #define latchPin D0
+
+//The following pin can be changed if needed
 #define clockPin D1
 #define data_R1 D3
 #define data_R2 D2
@@ -10,6 +14,7 @@
 #define lc_74138 D6
 #define ld_74138 D5 
 
+//if green is needed, repurpose TX and RX to GPIO, and connect to data_G1 and data_G2
 
 ESP8266_LED_64x16_Matrix LEDMATRIX;
 
@@ -25,6 +30,9 @@ void setup()
 	uint8_t t[8] = { latchPin, clockPin, data_R1, en_74138, la_74138, lb_74138, lc_74138, ld_74138};
 	LEDMATRIX.setPins(t);
 	
+	//setDisplay(type, panel_number)
+	//type must be 0, for 64x16 single red
+	// panel_number is the number of panels in serial
 	LEDMATRIX.setDisplay(0, 1);
 
 

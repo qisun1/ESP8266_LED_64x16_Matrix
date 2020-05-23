@@ -152,7 +152,10 @@ public:
 
    ESP8266_LED_64x16_Matrix();
    
-   void setDisplay(uint8_t matrixType, uint8_t panels); //matrixType mode is an integer code: 0:64x16, single red only; other types not implemented 
+   //matrixType: 0 for 64x16 panel RED only; other types not implemented yet
+   //panels is the number of panels in serial
+   void setDisplay(uint8_t matrixType, uint8_t panels); 
+
    void setPins(uint8_t pins[8]);
    void turnOn();
    void turnOff();
