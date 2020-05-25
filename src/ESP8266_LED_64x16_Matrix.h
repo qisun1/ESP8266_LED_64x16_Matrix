@@ -11,6 +11,7 @@ https://github.com/qisun1/ESP8266_LED_64x16_Matrix
 #include <Arduino.h>
 
 #define nextT 1000
+#define frameOrientation false
 
 static const uint8_t font8x16_basic[] = {
 	/*   (32) */ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -154,6 +155,7 @@ public:
    
    //matrixType: 0 for 64x16 panel RED only; other types not implemented yet
    //panels is the number of panels in serial
+   // orientation of the display true or false
    void setDisplay(uint8_t matrixType, uint8_t panels); 
 
    void setPins(uint8_t pins[8]);
